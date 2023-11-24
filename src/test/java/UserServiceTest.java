@@ -7,6 +7,8 @@ import org.junit.Test;
 import java.util.List;
 
 public class UserServiceTest {
+
+
     private final UserService userService = new UserServiceImpl();
 
     private final String testName = "Ivan";
