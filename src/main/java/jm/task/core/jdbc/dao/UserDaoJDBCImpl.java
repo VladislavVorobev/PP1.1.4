@@ -9,7 +9,7 @@ import java.util.List;
 import static jm.task.core.jdbc.util.Util.getConnection;
 
 public class UserDaoJDBCImpl implements UserDao {
-    private Connection connection;
+    private final Connection connection;
     public UserDaoJDBCImpl() {
         connection = getConnection();
     }
@@ -41,36 +41,17 @@ public class UserDaoJDBCImpl implements UserDao {
 
     }
 
-    public List<User> saveUser(String name, String lastName, byte age) {
-        String query = "INSERT INTO users (name, lastName, age) VALUES (?, ?, ?)";
-        List<User> users = new ArrayList<>();
-
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
+    public void saveUser(String name, String lastName, byte age) {
+        try (PreparedStatement statement = connection.prepareStatement(
+                "INSERT INTO users (name, lastName, age) VALUES (?, ?, ?)")) {
             statement.setString(1, name);
             statement.setString(2, lastName);
             statement.setByte(3, age);
             statement.executeUpdate();
-            System.out.println("User с именем – " + name + " добавлен в базу данных");
-
-
-            String selectQuery = "SELECT * FROM users";
-            try (PreparedStatement selectStatement = connection.prepareStatement(selectQuery);
-                 ResultSet resultSet = selectStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    long id = resultSet.getLong("id");
-                    String userName = resultSet.getString("name");
-                    String userLastName = resultSet.getString("lastName");
-                    byte userAge = resultSet.getByte("age");
-                    users.add(new User(id, userName, userLastName, userAge));
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            System.out.println("User was added!");
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to save user", e);
         }
-
-        return users;
     }
 
     public void removeUserById(long id) {

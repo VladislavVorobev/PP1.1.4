@@ -21,9 +21,9 @@ public class UserDaoHibernateImpl implements UserDao {
     }
 
     @Override
-    public List<User> saveUser(String name, String lastName, byte age) {
+    public void saveUser(String name, String lastName, byte age) {
 
-        return null;
+
     }
 
     @Override
