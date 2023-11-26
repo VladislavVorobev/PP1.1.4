@@ -48,7 +48,7 @@ public class UserDaoJDBCImpl implements UserDao {
             statement.setString(2, lastName);
             statement.setByte(3, age);
             statement.executeUpdate();
-            System.out.println("User was added!");
+            System.out.println("User с именем – " + name + " добавлен в базу данных");
         } catch (SQLException e) {
             throw new RuntimeException("Failed to save user", e);
         }
@@ -66,24 +66,30 @@ public class UserDaoJDBCImpl implements UserDao {
 
     }
 
+    @Override
     public List<User> getAllUsers() {
-        List<User> users = new ArrayList<>();
-        String query = "SELECT * FROM users";
+        List<User> userList = new ArrayList<>();
 
-        try (PreparedStatement statement = connection.prepareStatement(query);
-             ResultSet resultSet = statement.executeQuery()) {
+        String sql = "SELECT ID, NAME, LASTNAME, AGE FROM users";
+
+        try (Connection connection = getConnection();
+             Statement stat = connection.createStatement()) {
+
+            ResultSet resultSet = stat.executeQuery(sql);
             while (resultSet.next()) {
-                long id = resultSet.getLong("id");
-                String name = resultSet.getString("name");
-                String lastName = resultSet.getString("lastName");
-                byte age = resultSet.getByte("age");
-                users.add(new User(id, name, lastName, age));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+                User user = new User();
+                user.setId(resultSet.getLong("ID"));
+                user.setName(resultSet.getString("NAME"));
+                user.setLastName(resultSet.getString("LASTNAME"));
+                user.setAge(resultSet.getByte("AGE"));
 
-        return users;
+                userList.add(user);
+            }
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return userList;
 
     }
 
